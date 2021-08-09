@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface creditRepository extends MongoRepository<credit, String> {
-	boolean existsByIdAccount(String id);
+	boolean existsByIdAccount(String id); 
 }
