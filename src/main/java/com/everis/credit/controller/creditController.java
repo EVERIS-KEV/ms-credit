@@ -21,7 +21,7 @@ public class creditController {
   @Autowired
   creditService service;
 
-  @GetMapping("/{id}")
+  @GetMapping("/byCustomer/{id}")
   public Flux<credit> getById(@PathVariable("id") String id) {
     return service.getByCustomer(id);
   }
