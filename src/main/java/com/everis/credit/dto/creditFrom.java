@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 public class creditFrom {
   @NotBlank(message = "Debe seleccionar un cliente.")
-  private String idAccount; 
+  private String idCustomer; 
   private double baseCreditLimit;
   @NotBlank(message = "Debe ingresar una contraseña para su tarjeta.")
   private String password;

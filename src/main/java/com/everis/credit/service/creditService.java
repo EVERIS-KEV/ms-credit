@@ -1,66 +1,84 @@
 package com.everis.credit.service;
 
-import com.everis.credit.dto.customer;
-import com.everis.credit.dto.message;
-import com.everis.credit.dto.operation;
-import com.everis.credit.logic.myFunctions;
+import com.everis.credit.dto.*; 
 import com.everis.credit.model.credit;
+import com.everis.credit.webclient.webclient;
 import com.everis.credit.repository.creditRepository;
-import java.util.ArrayList;
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.*; 
+import reactor.core.publisher.*; 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional; 
 
 @Service
 @Transactional
 public class creditService {
   @Autowired
-  creditRepository repository;
-
-  WebClient webclient = WebClient.create("http://localhost:8081");
+  creditRepository repository; 
 
   private Boolean verifyCustomer(String id) {
-    return webclient
+    return webclient.customer
       .get()
-      .uri("/api/customers/verifyId/{id}", id)
+      .uri("/verifyId/{id}", id)
       .retrieve()
       .bodyToMono(Boolean.class)
       .block();
   }
 
   private customer customerFind(String id) {
-    return webclient
+    return webclient.customer
       .get()
-      .uri("/api/customers/{id}", id)
+      .uri("/{id}", id)
       .retrieve()
       .bodyToMono(customer.class)
       .block();
   }
 
   private Boolean existsByNumberCreditCard(String number, String passowrd) {
-    List<credit> list = repository.findAll();
+	  return repository.findAll().stream().filter( c ->  c.getCreditcard().getNumberCard().equals(number) && c.getCreditcard().getPassword().equals(  
+  	        webclient.logic
+	        .get()
+	        .uri("/encriptBySha1/" + passowrd)
+	        .retrieve()
+	        .bodyToMono(String.class)
+	        .block() ) ).toList().isEmpty();
+	  
+    
+	  /** List<credit> list = repository.findAll();
 
-    for (int i = 0; i < list.size(); i++) if (
-      list.get(i).getCreditcard().getNumberCard().equals(number) &&
-      list.get(i).getCreditcard().getPassword().equals(myFunctions.encriptSHA1(passowrd))
+    for (int i = 0; i < list.size(); i++) 
+    	if ( list.get(i).getCreditcard().getNumberCard().equals(number) && list.get(i).getCreditcard().getPassword().equals( webclient.logic
+    	        .get()
+    	        .uri("/encriptBySha1/" + passowrd)
+    	        .retrieve()
+    	        .bodyToMono(String.class)
+    	        .block() )
     ) return true;
 
-    return false;
+    return false; **/
   }
 
-  private credit findByNumberCreditCard(String number, String passowrd) {
-    List<credit> list = repository.findAll();
+  private credit findByNumberCreditCard(String number, String passowrd) { 
+	  return repository.findAll().stream().filter( c ->  c.getCreditcard().getNumberCard().equals(number) && c.getCreditcard().getPassword().equals(  
+  	        webclient.logic
+	        .get()
+	        .uri("/encriptBySha1/" + passowrd)
+	        .retrieve()
+	        .bodyToMono(String.class)
+	        .block() ) ).toList().get(0); 
 
-    for (int i = 0; i < list.size(); i++) if (
+    /** for (int i = 0; i < list.size(); i++) if (
       list.get(i).getCreditcard().getNumberCard().equals(number) &&
-      list.get(i).getCreditcard().getPassword().equals(myFunctions.encriptSHA1(passowrd))
+      list.get(i).getCreditcard().getPassword().equals(  webclient.logic
+  	        .get()
+  	        .uri("/encriptBySha1/" + passowrd)
+  	        .retrieve()
+  	        .bodyToMono(String.class)
+  	        .block() )
     ) return list.get(i);
 
-    return null;
+    return null;**/
   }
 
   private String addOperations(
@@ -97,7 +115,7 @@ public class creditService {
       obj.setTypeAccount(customerFind(idAccount).getType());
 
       if (customerFind(idAccount).getType().equals("personal")) {
-        if (!repository.existsByIdAccount(idAccount)) repository.save(obj); else msg =
+        if ( !repository.existsByIdCustomer(idAccount) ) repository.save(obj); else msg =
           "Usted ya no puede tener mas creditos.";
       } else repository.save(obj);
     } else msg = "Cliente no registrado";
@@ -125,13 +143,14 @@ public class creditService {
     return Mono.just(new message(msg));
   }
 
-  public Flux<credit> getByCustomer(String id) {
-    List<credit> listB = new ArrayList<credit>();
-
-    for (int i = 0; i < repository.findAll().size(); i++) if (
-      repository.findAll().get(i).getIdAccount().equals(id)
-    ) listB.add(repository.findAll().get(i));
-
-    return Flux.fromIterable(listB);
+  public Flux<credit> getByCustomer(String id) { 
+	//List<credit> listB = new ArrayList<credit>();
+	//for (int i = 0; i < repository.findAll().size(); i++)
+	//if ( repository.findAll().get(i).getIdCustomer().equals(id) ) listB.add(repository.findAll().get(i));
+	return Flux.fromIterable(repository.findAll().stream().filter( c -> c.getIdCustomer().equals(id) ).toList());
+  }
+  
+  public Flux<credit> getAll(){
+	  return Flux.fromIterable( repository.findAll() );
   }
 }

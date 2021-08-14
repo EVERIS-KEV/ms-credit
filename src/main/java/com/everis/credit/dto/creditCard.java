@@ -1,18 +1,27 @@
 package com.everis.credit.dto;
 
-import com.everis.credit.logic.myFunctions;
-
-import lombok.*; 
+import com.everis.credit.webclient.webclient;
+import lombok.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
 public class creditCard {
-	private String numberCard;
-	private String password; 
-	
-	public creditCard(String password) {
-		this.numberCard = myFunctions.numberAccount(8);
-		this.password = myFunctions.encriptSHA1(password);
-	}
+  private String numberCard = webclient.logic
+    .get()
+    .uri("/generatedNumberLong/6")
+    .retrieve()
+    .bodyToMono(String.class)
+    .block();
+  private String password;
+
+  public creditCard(String password) {
+    this.password =
+      webclient.logic
+        .get()
+        .uri("/encriptBySha1/" + password)
+        .retrieve()
+        .bodyToMono(String.class)
+        .block();
+  }
 }

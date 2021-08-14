@@ -9,30 +9,24 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Document(collection = "credits")
 public class credit {
   @Id
   private String idCredit;
 
-  private String idAccount; //ID DEL CLIENTE
+  private String idCustomer;  
   private String typeAccount;
   private double baseCreditLimit;
   private double amount;
 
   private creditCard creditcard;
-  private List<operation> operation;
+  private List<operation> operation = new ArrayList<operation>(); 
 
-  public credit() {
-    this.operation = new ArrayList<operation>();
-  }
-
-  public credit(String idAccount, double baseCreditLimit, String password) {
-    this.idAccount = idAccount;
+  public credit(String idCustomer, double baseCreditLimit, String password) {
+    this.idCustomer = idCustomer;
     this.baseCreditLimit = baseCreditLimit;
-    this.amount = baseCreditLimit;
-    
-    this.creditcard = new creditCard(password);
-
-    this.operation = new ArrayList<operation>();
+    this.amount = baseCreditLimit; 
+    this.creditcard = new creditCard(password); 
   }
 }
