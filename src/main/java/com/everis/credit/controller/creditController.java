@@ -31,6 +31,11 @@ public class creditController {
   public Flux<credit> getById(@PathVariable("id") String id) {
     return service.getByCustomer(id);
   }
+  
+  @GetMapping("/verifyCustomer/{id}")
+  public Mono<Boolean> verify(@PathVariable("id") String id) {
+	  return service._verifyCustomer(id);
+  }
 
   @PostMapping("/save")
   public Mono<Object> created(

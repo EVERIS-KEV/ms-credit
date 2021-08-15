@@ -36,49 +36,23 @@ public class creditService {
   }
 
   private Boolean existsByNumberCreditCard(String number, String passowrd) {
-	  return repository.findAll().stream().filter( c ->  c.getCreditcard().getNumberCard().equals(number) && c.getCreditcard().getPassword().equals(  
-  	        webclient.logic
+	return repository.findAll().stream().filter( c ->  c.getCreditcard().getNumberCard().equals(number) && c.getCreditcard().getPassword().equals(
+			webclient.logic
 	        .get()
 	        .uri("/encriptBySha1/" + passowrd)
 	        .retrieve()
 	        .bodyToMono(String.class)
-	        .block() ) ).toList().isEmpty();
-	  
-    
-	  /** List<credit> list = repository.findAll();
-
-    for (int i = 0; i < list.size(); i++) 
-    	if ( list.get(i).getCreditcard().getNumberCard().equals(number) && list.get(i).getCreditcard().getPassword().equals( webclient.logic
-    	        .get()
-    	        .uri("/encriptBySha1/" + passowrd)
-    	        .retrieve()
-    	        .bodyToMono(String.class)
-    	        .block() )
-    ) return true;
-
-    return false; **/
+	        .block() ) ).toList().isEmpty(); 
   }
 
   private credit findByNumberCreditCard(String number, String passowrd) { 
-	  return repository.findAll().stream().filter( c ->  c.getCreditcard().getNumberCard().equals(number) && c.getCreditcard().getPassword().equals(  
+	return repository.findAll().stream().filter( c ->  c.getCreditcard().getNumberCard().equals(number) && c.getCreditcard().getPassword().equals(  
   	        webclient.logic
 	        .get()
 	        .uri("/encriptBySha1/" + passowrd)
 	        .retrieve()
 	        .bodyToMono(String.class)
-	        .block() ) ).toList().get(0); 
-
-    /** for (int i = 0; i < list.size(); i++) if (
-      list.get(i).getCreditcard().getNumberCard().equals(number) &&
-      list.get(i).getCreditcard().getPassword().equals(  webclient.logic
-  	        .get()
-  	        .uri("/encriptBySha1/" + passowrd)
-  	        .retrieve()
-  	        .bodyToMono(String.class)
-  	        .block() )
-    ) return list.get(i);
-
-    return null;**/
+	        .block() ) ).toList().get(0);  
   }
 
   private String addOperations(
@@ -143,14 +117,15 @@ public class creditService {
     return Mono.just(new message(msg));
   }
 
-  public Flux<credit> getByCustomer(String id) { 
-	//List<credit> listB = new ArrayList<credit>();
-	//for (int i = 0; i < repository.findAll().size(); i++)
-	//if ( repository.findAll().get(i).getIdCustomer().equals(id) ) listB.add(repository.findAll().get(i));
+  public Flux<credit> getByCustomer(String id) {  
 	return Flux.fromIterable(repository.findAll().stream().filter( c -> c.getIdCustomer().equals(id) ).toList());
   }
   
   public Flux<credit> getAll(){
-	  return Flux.fromIterable( repository.findAll() );
+	return Flux.fromIterable( repository.findAll() );
+  }
+  
+  public Mono<Boolean> _verifyCustomer(String id){
+	return Mono.just(!repository.findAll().stream().filter( c  -> c.getIdCustomer().equals(id) ).toList().isEmpty());
   }
 }
