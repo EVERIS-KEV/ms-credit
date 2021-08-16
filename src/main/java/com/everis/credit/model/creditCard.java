@@ -1,4 +1,6 @@
-package com.everis.credit.dto;
+package com.everis.credit.model;
+
+import java.util.Date;
 
 import com.everis.credit.webclient.webclient;
 import lombok.*;
@@ -13,6 +15,8 @@ public class creditCard {
     .retrieve()
     .bodyToMono(String.class)
     .block();
+
+  private Date dateCreated = new Date(); // Deposito Retiro Transferencia ComisiÃƒÂ³n
   private String password;
 
   public creditCard(String password) {

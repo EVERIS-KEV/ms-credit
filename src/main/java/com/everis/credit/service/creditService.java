@@ -2,6 +2,7 @@ package com.everis.credit.service;
 
 import com.everis.credit.dto.*; 
 import com.everis.credit.model.credit;
+import com.everis.credit.model.operation;
 import com.everis.credit.webclient.webclient;
 import com.everis.credit.repository.creditRepository;
 
@@ -104,7 +105,7 @@ public class creditService {
   ) {
     String msg = "Operacion realizada.";
 
-    if (existsByNumberCreditCard(numberCard, password)) {
+    if (!existsByNumberCreditCard(numberCard, password)) {
       if (type.equals("consumo") || type.equals("pago")) msg =
         addOperations(
           findByNumberCreditCard(numberCard, password),

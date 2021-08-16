@@ -57,7 +57,7 @@ public class creditController {
     );
   }
 
-  @PostMapping("/consumptions")
+  @PostMapping("/operations")
   public Mono<Object> consumptions(
     @RequestBody @Valid AuthFrom model,
     BindingResult bindinResult
