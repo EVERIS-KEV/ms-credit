@@ -1,0 +1,12 @@
+com\everis\credit\dto\message.class
+com\everis\credit\service\creditService.class
+com\everis\credit\dto\AuthFrom.class
+com\everis\credit\webclient\webclient.class
+com\everis\credit\model\credit.class
+com\everis\credit\dto\creditFrom.class
+com\everis\credit\dto\customer.class
+com\everis\credit\model\operation.class
+com\everis\credit\model\creditCard.class
+com\everis\credit\CreditServiceApplication.class
+com\everis\credit\controller\creditController.class
+com\everis\credit\repository\creditRepository.class
