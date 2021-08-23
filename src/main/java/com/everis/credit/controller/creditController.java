@@ -40,8 +40,18 @@ public class creditController {
 		return service.getByCustomer(id);
 	}
 
+	@GetMapping("/byNumberCard/{number}")
+	public Mono<Object> byNumberCard(@PathVariable("number") String number) {
+		return service.byNumberCard(number);
+	}
+
+	@GetMapping("/verifyNumber/{number}")
+	public Mono<Boolean> verifyNumber(@PathVariable("number") String number) {
+		return service._verifyNumber(number);
+	}
+
 	@GetMapping("/verifyCustomer/{id}")
-	public Mono<Boolean> verify(@PathVariable("id") String id) {
+	public Mono<Boolean> verifyCustomer(@PathVariable("id") String id) {
 		return service._verifyCustomer(id);
 	}
 
