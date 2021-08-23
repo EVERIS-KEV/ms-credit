@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Setter
 @NoArgsConstructor
 @Document(collection = "credits")
-public class credit {
+public class Credit {
   @Id
   private String idCredit;
 
@@ -18,15 +18,15 @@ public class credit {
   private double baseCreditLimit;
   private double amount;
 
-  private creditCard creditcard;
+  private CreditCard creditcard;
 
   private Date dateCreated = new Date(); // Deposito Retiro Transferencia ComisiÃƒÆ’Ã‚Â³n
-  private List<operation> operation = new ArrayList<operation>();
+  private List<Operation> operation = new ArrayList<>();
 
-  public credit(String idCustomer, double baseCreditLimit, String password) {
+  public Credit(String idCustomer, double baseCreditLimit, String password) {
     this.idCustomer = idCustomer;
     this.baseCreditLimit = baseCreditLimit;
     this.amount = baseCreditLimit;
-    this.creditcard = new creditCard(password);
+    this.creditcard = new CreditCard(password);
   }
 }

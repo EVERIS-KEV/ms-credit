@@ -7,7 +7,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class creditFrom {
+public class CreditFrom {
   @NotBlank(message = "Debe seleccionar un cliente.")
   private String idCustomer; 
   private double baseCreditLimit;

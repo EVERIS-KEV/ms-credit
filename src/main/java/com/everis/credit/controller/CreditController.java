@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.everis.credit.dto.AuthFrom;
-import com.everis.credit.dto.creditFrom;
-import com.everis.credit.dto.message;
-import com.everis.credit.model.credit;
-import com.everis.credit.service.creditService;
+import com.everis.credit.dto.CreditFrom;
+import com.everis.credit.dto.Message;
+import com.everis.credit.model.Credit;
+import com.everis.credit.service.CreditService;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -26,17 +26,17 @@ import reactor.core.publisher.Mono;
 @CrossOrigin(origins = "*", methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT,
 		RequestMethod.DELETE })
 @RequestMapping()
-public class creditController {
+public class CreditController {
 	@Autowired
-	creditService service;
+    CreditService service;
 
 	@GetMapping("/")
-	public Flux<credit> findAll() {
+	public Flux<Credit> findAll() {
 		return service.getAll();
 	}
 
 	@GetMapping("/byCustomer/{id}")
-	public Flux<credit> getById(@PathVariable("id") String id) {
+	public Flux<Credit> getById(@PathVariable("id") String id) {
 		return service.getByCustomer(id);
 	}
 
@@ -47,23 +47,23 @@ public class creditController {
 
 	@GetMapping("/verifyNumber/{number}")
 	public Mono<Boolean> verifyNumber(@PathVariable("number") String number) {
-		return service._verifyNumber(number);
+		return service.verifyNumber(number);
 	}
 
 	@GetMapping("/verifyCustomer/{id}")
 	public Mono<Boolean> verifyCustomer(@PathVariable("id") String id) {
-		return service._verifyCustomer(id);
+		return service.verifyCustomerId(id);
 	}
 
 	@PostMapping("/save")
-	public Mono<Object> created(@RequestBody @Valid creditFrom model, BindingResult bindinResult) {
+	public Mono<Object> created(@RequestBody @Valid CreditFrom model, BindingResult bindinResult) {
 		String msg = "";
 
 		if (bindinResult.hasErrors()) {
 			for (int i = 0; i < bindinResult.getAllErrors().size(); i++) {
 				msg = bindinResult.getAllErrors().get(0).getDefaultMessage();
 			}
-			return Mono.just(new message(msg));
+			return Mono.just(new Message(msg));
 		}
 
 		return service.save(model.getIdCustomer(), model.getBaseCreditLimit(), model.getPassword());
@@ -77,7 +77,7 @@ public class creditController {
 			for (int i = 0; i < bindinResult.getAllErrors().size(); i++) {
 				msg = bindinResult.getAllErrors().get(0).getDefaultMessage();
 			}
-			return Mono.just(new message(msg));
+			return Mono.just(new Message(msg));
 		}
 
 		return service.saveOperations(model.getCreditCardNumber(), model.getPassword(), model.getAmount(),

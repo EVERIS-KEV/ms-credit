@@ -2,44 +2,46 @@ package com.everis.credit.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.everis.credit.constant.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.everis.credit.dto.customer;
-import com.everis.credit.dto.message;
-import com.everis.credit.model.credit;
-import com.everis.credit.model.creditCard;
-import com.everis.credit.model.operation;
-import com.everis.credit.repository.creditRepository;
-import com.everis.credit.webclient.webclient;
+import com.everis.credit.dto.Customer;
+import com.everis.credit.dto.Message;
+import com.everis.credit.model.Credit;
+import com.everis.credit.model.CreditCard;
+import com.everis.credit.model.Operation;
+import com.everis.credit.repository.CreditRepository;
+import com.everis.credit.webclient.Webclient;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
 @Transactional
-public class creditService {
+public class CreditService {
 	@Autowired
-	creditRepository repository; //
+	CreditRepository repository; //
 
 	private Boolean verifyCustomer(String id) {
-		return webclient.customer.get().uri("/verifyId/{id}", id).retrieve().bodyToMono(Boolean.class).block();
+		return Webclient.customer.get().uri("/verifyId/{id}", id).retrieve().bodyToMono(Boolean.class).block();
 	}
 
-	private customer customerFind(String id) {
-		return webclient.customer.get().uri("/{id}", id).retrieve().bodyToMono(customer.class).block();
+	private Customer customerFind(String id) {
+		return Webclient.customer.get().uri("/{id}", id).retrieve().bodyToMono(Customer.class).block();
 	}
 
 	private Boolean existsByNumberCreditCard(String number, String passowrd) {
 		boolean x = false;
-		String code = webclient.logic.get().uri("/encriptBySha1/" + passowrd).retrieve().bodyToMono(String.class)
+		String code = Webclient.logic.get().uri("/encriptBySha1/" + passowrd).retrieve().bodyToMono(String.class)
 				.block();
 
 		for (int i = 0; i < repository.findAll().size(); i++) {
-			creditCard card = repository.findAll().get(i).getCreditcard();
+			CreditCard card = repository.findAll().get(i).getCreditcard();
 			if (card.getNumberCard().equals(number) && card.getPassword().equals(code)) {
 				x = true;
 			}
@@ -48,8 +50,8 @@ public class creditService {
 		return x;
 	}
 
-	private credit findByNumberCreditCard(String number, String passowrd) {
-		String code = webclient.logic.get().uri("/encriptBySha1/" + passowrd).retrieve().bodyToMono(String.class)
+	private Credit findByNumberCreditCard(String number, String passowrd) {
+		String code = Webclient.logic.get().uri("/encriptBySha1/" + passowrd).retrieve().bodyToMono(String.class)
 				.block();
 		for (int i = 0; i < repository.findAll().size(); i++) {
 			if (repository.findAll().get(i).getCreditcard().getNumberCard().equals(number)
@@ -61,7 +63,7 @@ public class creditService {
 
 	}
 
-	private String addOperations(credit creditObj, String type, operation obj, Double amount) {
+	private String addOperations(Credit creditObj, String type, Operation obj, Double amount) {
 		double base = creditObj.getBaseCreditLimit();
 		double baseB = creditObj.getAmount();
 		String msg = "Monto pagado.";
@@ -86,43 +88,43 @@ public class creditService {
 	}
 
 	public Mono<Object> save(String idAccount, double baseCreditLimit, String password) {
-		String msg = "Credito registrado.";
-		if (verifyCustomer(idAccount)) {
-			credit obj = new credit(idAccount, baseCreditLimit, password);
+		String msg = Constants.Messages.REGISTERED_CREDIT;
+		if (Boolean.TRUE.equals(verifyCustomer(idAccount))) {
+			Credit obj = new Credit(idAccount, baseCreditLimit, password);
 			obj.setTypeAccount(customerFind(idAccount).getType());
 
 			if (!customerFind(idAccount).getType().equals("personal") || !repository.existsByIdCustomer(idAccount)) {
 				repository.save(obj);
 			} else {
-				msg = "Usted ya no puede tener mas creditos.";
+				msg = Constants.Messages.CLIENT_NO_MORE_CREDITS;
 			}
 		} else {
-			msg = "Cliente no registrado";
+			msg = Constants.Messages.CLIENT_NOT_REGISTERED;
 		}
-		return Mono.just(new message(msg));
+		return Mono.just(new Message(msg));
 	}
 
 	public Mono<Object> saveOperations(String numberCard, String password, Double amount, String type) {
-		String msg = "Operacion realizada.";
+		String msg;
 
-		if (existsByNumberCreditCard(numberCard, password)) {
+		if (Boolean.TRUE.equals(existsByNumberCreditCard(numberCard, password))) {
 			if (type.equals("consumo") || type.equals("pago")) {
-				msg = addOperations(findByNumberCreditCard(numberCard, password), type, new operation(amount, type),
+				msg = addOperations(Objects.requireNonNull(findByNumberCreditCard(numberCard, password)), type, new Operation(amount, type),
 						amount);
 			} else {
-				msg = "Operacion incorrecta.";
+				msg = Constants.Messages.INCORRECT_OPERATION;
 			}
 		} else {
-			msg = "Datos incorrectos.";
+			msg = Constants.Messages.INCORRECT_DATA;
 		}
 
-		return Mono.just(new message(msg));
+		return Mono.just(new Message(msg));
 	}
 
-	public Flux<credit> getByCustomer(String id) {
+	public Flux<Credit> getByCustomer(String id) {
 
-		List<credit> lista = repository.findAll();
-		List<credit> listb = new ArrayList<credit>();
+		List<Credit> lista = repository.findAll();
+		List<Credit> listb = new ArrayList<>();
 
 		for (int i = 0; i < lista.size(); i++) {
 			if (lista.get(i).getIdCustomer().equals(id)) {
@@ -133,11 +135,11 @@ public class creditService {
 		return Flux.fromIterable(listb);
 	}
 
-	public Flux<credit> getAll() {
+	public Flux<Credit> getAll() {
 		return Flux.fromIterable(repository.findAll());
 	}
 
-	public Mono<Boolean> _verifyCustomer(String id) {
+	public Mono<Boolean> verifyCustomerId(String id) {
 
 		for (int i = 0; i < repository.findAll().size(); i++) {
 			if (repository.findAll().get(i).getIdCustomer().equals(id)) {
@@ -148,14 +150,9 @@ public class creditService {
 		return Mono.just(false);
 	}
 
-	public Mono<Boolean> _verifyNumber(String number) {
-
-		if (!repository.findAll().stream().filter(c -> c.getCreditcard().getNumberCard().equals(number))
-				.collect(Collectors.toList()).isEmpty()) {
-			return Mono.just(true);
-		}
-
-		return Mono.just(false);
+	public Mono<Boolean> verifyNumber(String number) {
+		return Mono.just(!repository.findAll().stream().filter(c -> c.getCreditcard().getNumberCard().equals(number))
+				.collect(Collectors.toList()).isEmpty());
 	}
 
 	public Mono<Object> byNumberCard(String number) {

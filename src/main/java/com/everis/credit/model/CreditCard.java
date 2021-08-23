@@ -2,14 +2,14 @@ package com.everis.credit.model;
 
 import java.util.Date;
 
-import com.everis.credit.webclient.webclient;
+import com.everis.credit.webclient.Webclient;
 import lombok.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
-public class creditCard {
-  private String numberCard = webclient.logic
+public class CreditCard {
+  private String numberCard = Webclient.logic
     .get()
     .uri("/generatedNumberLong/6")
     .retrieve()
@@ -19,9 +19,9 @@ public class creditCard {
   private Date dateCreated = new Date(); // Deposito Retiro Transferencia ComisiÃƒÂ³n
   private String password;
 
-  public creditCard(String password) {
+  public CreditCard(String password) {
     this.password =
-      webclient.logic
+      Webclient.logic
         .get()
         .uri("/encriptBySha1/" + password)
         .retrieve()

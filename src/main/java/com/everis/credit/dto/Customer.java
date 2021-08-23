@@ -2,14 +2,13 @@ package com.everis.credit.dto;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class customer {
+public class Customer {
   @Id
   private String idclient;
 
