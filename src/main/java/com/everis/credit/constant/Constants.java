@@ -15,9 +15,12 @@ public enum Constants
 
     public static class Path{
 
-        public static final String GATEWAY = "44.196.6.42:8090/";
-        public static final String SERVICE_PATH = "service";
-        public static final String HTTP_CONSTANT = "http://";
+        private static final String IPR = "host.docker.internal"; 
+        private static final String PORT = "8090"; 
+
+        private static final String GATEWAY = IPR.concat(":").concat(PORT);
+        private static final String SERVICE_PATH = "/service";
+        private static final String HTTP_CONSTANT = "http://";
 
         public static final String CUSTOMERS_PATH = HTTP_CONSTANT.concat(GATEWAY).concat(SERVICE_PATH).concat("/customers");
         public static final String LOGIC_PATH = HTTP_CONSTANT.concat(GATEWAY).concat(SERVICE_PATH).concat("/logic");

@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 public class AuthFrom {
   @NotBlank(message = "Debe ingresar su tarjeta.")
-  private String creditCardNumber;
+  private String creditCardNumber; 
 
   @NotBlank(message = "Debe ingresar su contrasena.")
   private String password;   

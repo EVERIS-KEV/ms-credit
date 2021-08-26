@@ -9,7 +9,7 @@ import org.springframework.data.annotation.Id;
 @AllArgsConstructor
 
 public class Customer {
-  @Id
+  @Id 
   private String idclient;
 
   private String dni;

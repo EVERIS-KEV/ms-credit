@@ -25,7 +25,7 @@ import reactor.core.publisher.Mono;
 @Transactional
 public class CreditService {
 	@Autowired
-	CreditRepository repository; //
+	CreditRepository repository;
 
 	private Boolean verifyCustomer(String id) {
 		return Webclient.customer.get().uri("/verifyId/{id}", id).retrieve().bodyToMono(Boolean.class).block();
@@ -109,8 +109,8 @@ public class CreditService {
 
 		if (Boolean.TRUE.equals(existsByNumberCreditCard(numberCard, password))) {
 			if (type.equals("consumo") || type.equals("pago")) {
-				msg = addOperations(Objects.requireNonNull(findByNumberCreditCard(numberCard, password)), type, new Operation(amount, type),
-						amount);
+				msg = addOperations(Objects.requireNonNull(findByNumberCreditCard(numberCard, password)), type,
+						new Operation(amount, type), amount);
 			} else {
 				msg = Constants.Messages.INCORRECT_OPERATION;
 			}
@@ -123,16 +123,8 @@ public class CreditService {
 
 	public Flux<Credit> getByCustomer(String id) {
 
-		List<Credit> lista = repository.findAll();
-		List<Credit> listb = new ArrayList<>();
-
-		for (int i = 0; i < lista.size(); i++) {
-			if (lista.get(i).getIdCustomer().equals(id)) {
-				listb.add(lista.get(i));
-			}
-		}
-
-		return Flux.fromIterable(listb);
+		return Flux.fromIterable(
+				repository.findAll().stream().filter(c -> c.getIdCustomer().equals(id)).collect(Collectors.toList()));
 	}
 
 	public Flux<Credit> getAll() {
@@ -140,14 +132,8 @@ public class CreditService {
 	}
 
 	public Mono<Boolean> verifyCustomerId(String id) {
-
-		for (int i = 0; i < repository.findAll().size(); i++) {
-			if (repository.findAll().get(i).getIdCustomer().equals(id)) {
-				return Mono.just(true);
-			}
-		}
-
-		return Mono.just(false);
+		return Mono.just(!repository.findAll().stream().filter(c -> c.getIdCustomer().equals(id))
+				.collect(Collectors.toList()).isEmpty());
 	}
 
 	public Mono<Boolean> verifyNumber(String number) {

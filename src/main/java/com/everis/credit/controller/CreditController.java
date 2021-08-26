@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.everis.credit.dto.AuthFrom;
-import com.everis.credit.dto.CreditFrom;
+import com.everis.credit.dto.CreditFrom; 
 import com.everis.credit.dto.Message;
 import com.everis.credit.model.Credit;
 import com.everis.credit.service.CreditService;
@@ -29,6 +29,15 @@ import reactor.core.publisher.Mono;
 public class CreditController {
 	@Autowired
     CreditService service;
+
+	private Mono<Object> BindingResultErrors(BindingResult bindinResult){
+		String msg = "";
+
+		for (int i = 0; i < bindinResult.getAllErrors().size(); i++) {
+			msg = bindinResult.getAllErrors().get(0).getDefaultMessage();
+		}
+		return Mono.just(new Message(msg));
+	}
 
 	@GetMapping("/")
 	public Flux<Credit> findAll() {
@@ -56,14 +65,10 @@ public class CreditController {
 	}
 
 	@PostMapping("/save")
-	public Mono<Object> created(@RequestBody @Valid CreditFrom model, BindingResult bindinResult) {
-		String msg = "";
+	public Mono<Object> created(@RequestBody @Valid CreditFrom model, BindingResult bindinResult) { 
 
 		if (bindinResult.hasErrors()) {
-			for (int i = 0; i < bindinResult.getAllErrors().size(); i++) {
-				msg = bindinResult.getAllErrors().get(0).getDefaultMessage();
-			}
-			return Mono.just(new Message(msg));
+			return BindingResultErrors(bindinResult);
 		}
 
 		return service.save(model.getIdCustomer(), model.getBaseCreditLimit(), model.getPassword());
@@ -71,13 +76,9 @@ public class CreditController {
 
 	@PostMapping("/operations")
 	public Mono<Object> consumptions(@RequestBody @Valid AuthFrom model, BindingResult bindinResult) {
-		String msg = "";
 
 		if (bindinResult.hasErrors()) {
-			for (int i = 0; i < bindinResult.getAllErrors().size(); i++) {
-				msg = bindinResult.getAllErrors().get(0).getDefaultMessage();
-			}
-			return Mono.just(new Message(msg));
+			return BindingResultErrors(bindinResult);
 		}
 
 		return service.saveOperations(model.getCreditCardNumber(), model.getPassword(), model.getAmount(),
